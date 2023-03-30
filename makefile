@@ -5,7 +5,7 @@
 #	A makefile script for building mixed C & Assembly programs RPI3
 ###############################################################################
 
-
+.PHONY: clean all
 # The intermediate directory for compiled object files.
 BUILD = build/
 
@@ -38,4 +38,6 @@ $(BUILD)%.o: $(SOURCE)%.c
 # Rule to clean files.
 clean : 
 	-rm -f $(BUILD)*.o myProg
+	-rm kernel8.img kernel8.elf
+
 

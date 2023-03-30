@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "gpio.h"
 #include "uart.h"
+#include "fb.h"
+#include "dk.h"
 
 #define GPIO_BASE 0xFE200000
 
@@ -102,6 +104,13 @@ int main()
 {
 
 	initSNES();
+
+	uart_init();
+    fb_init();
+
+	int offx = 300;
+	int offy = 300;
+
 	print_message("Created by Aaron Tigley and Jaxon Sloan\n");
     
 	// Array is 17 length, but index 0 isn't used.
@@ -157,6 +166,27 @@ int main()
 			// Print the button pressed when the previous state was 1 (OFF) and the current state is 0 (ON)
 			print_message(button_pressed[i]);
 			print_message(" button is pressed\n");
+
+			for (int i =0; i < dk.width; i++) {
+				for (int j=0; j< dk.height; j++) {
+					myDrawPixel(i+offx,j+offy,0);
+				}
+			}
+
+			if (buttons[5] == 0) {
+				offy += 32;
+			}
+			else if (buttons[6] == 0) {
+				offy -= 32;
+			}
+			else if (buttons[7] == 0) {
+				offx -= 32;
+			}
+			else if (buttons[8] == 0) {
+				offx += 32;
+			}
+
+			myDrawImage(dk.pixel_data, dk.width, dk.height, offx, offy);
 		}
 
 		// Set the previous state of the button to the state that was read in this current interation of the loop.
