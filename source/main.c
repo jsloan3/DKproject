@@ -4,6 +4,7 @@
 #include "uart.h"
 #include "fb.h"
 #include "dk.h"
+#include "wall.h"
 
 #define GPIO_BASE 0xFE200000
 
@@ -16,6 +17,13 @@ unsigned *clo = (unsigned*)CLO_REG;
 
 static unsigned *gpio = (unsigned*)GPIO_BASE; // GPIO base
 
+#define SIZEX 20
+#define SIZEY 20
+int SCREENOFFX = 300;
+int SCREENOFFY = 300;
+int currentlevel[SIZEX][SIZEY];
+
+
 // GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or SET_GPIO_ALT(x,y)
 #define INP_GPIO(g) *(gpio+((g)/10)) &= ~(7<<(((g)%10)*3))
 #define OUT_GPIO(g) *(gpio+((g)/10)) |= (1<<(((g)%10)*3))
@@ -26,34 +34,34 @@ static unsigned *gpio = (unsigned*)GPIO_BASE; // GPIO base
 #define DAT 10
 
 void initSNES() {
-INP_GPIO( CLK ); // CLK
-OUT_GPIO( CLK );
-INP_GPIO( LAT ); // LATCH
-OUT_GPIO( LAT );
-INP_GPIO( DAT ); // DATA
+	INP_GPIO( CLK ); // CLK
+	OUT_GPIO( CLK );
+	INP_GPIO( LAT ); // LATCH
+	OUT_GPIO( LAT );
+	INP_GPIO( DAT ); // DATA
 
 }
 
 void write_latch(int i){
-if (i == 1){
-	// gpio[GPSET0] = 1 << LAT;
-	(*GPSET0) = 1 << LAT;
-}
-else{
-	// gpio[GPCLR0] = 1 << LAT;
-	(*GPCLR0) = 1 << LAT;
-}
+	if (i == 1){
+		// gpio[GPSET0] = 1 << LAT;
+		(*GPSET0) = 1 << LAT;
+	}
+	else{
+		// gpio[GPCLR0] = 1 << LAT;
+		(*GPCLR0) = 1 << LAT;
+	}
 }
 
 void write_clock(int i){
-if (i == 1){
-	//gpio[GPSET0] = 1 << CLK;
-	(*GPSET0) = 1 << CLK;
-}
-else{
-	//gpio[GPCLR0] = 1 << CLK;
-	(*GPCLR0) = 1 << CLK;
-}
+	if (i == 1){
+		//gpio[GPSET0] = 1 << CLK;
+		(*GPSET0) = 1 << CLK;
+	}
+	else{
+		//gpio[GPCLR0] = 1 << CLK;
+		(*GPCLR0) = 1 << CLK;
+	}
 }
 
 
@@ -79,8 +87,7 @@ I know what you're thinking:
 "is it possible to learn this power?"
 Not from a jedi...
 */
-void *memcpy(void *dest, const void *src, size_t n)
-{
+void *memcpy(void *dest, const void *src, size_t n) {
     for (size_t i = 0; i < n; i++)
     {
         ((char*)dest)[i] = ((char*)src)[i];
@@ -89,24 +96,57 @@ void *memcpy(void *dest, const void *src, size_t n)
 
 // Uses UART I/O subroutines to print a message to the screen terminal.
 // Message address is passed as an arg.
-void print_message(char* message)
-{
-	void printf(char *str) {
-	uart_puts(str);
+void print_message(char* message) {
+		void printf(char *str) {
+		uart_puts(str);
+	}
+
+	printf(message);
+
 }
 
-printf(message);
+void renderscreen() {
+	for (int i = 0; i < SIZEX; i++) {
+		for (int j = 0; j < SIZEY; j++) {
+			if (currentlevel[i][j] == 1) {
+				myDrawImage(dk.pixel_data, dk.width, dk.height, (i*32 + SCREENOFFX), (j*32 + SCREENOFFY));
+			}
+		}
+	}
+}
 
+void initialrender() {
+	for (int i = 0; i < SIZEX; i++) {
+		for (int j = 0; j < SIZEY; j++) {
+			if (currentlevel[i][j] == 2) {
+				myDrawImage(wall.pixel_data, wall.width, wall.height, (i*32 + SCREENOFFX), (j*32 + SCREENOFFY));
+			}
+		}
+	}
 }
 
 
-int main()
-{
+
+int main() {
 
 	initSNES();
 
 	uart_init();
     fb_init();
+
+	int dkx = 0;
+	int dky = 0;
+
+	for (int i = 0; i < SIZEX; i++) {
+		for (int j = 0; j < SIZEY; j++) {
+			currentlevel[i][j] = 0;
+		}
+	}
+
+	currentlevel[10][10] = 2;
+	currentlevel[11][10] = 2;
+	currentlevel[10][11] = 2;
+	currentlevel[11][11] = 2;
 
 	int offx = 300;
 	int offy = 300;
@@ -117,86 +157,95 @@ int main()
 	int buttons[17] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int prev_state[17]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int pressed = 0;
-	// String array for printing purposes.
-	char* button_pressed[17] = {"\0","B",
-		"Y",
-		"Select",
-		"Start",
-		"DPAD-Up",
-		"DPAD-Down",
-		"DPAD-Left",
-		"DPAD-Right",
-		"A",
-		"X",
-		"Left Bumper",
-		"Right Bumper",
-		"1",
-		"1",
-		"1",
-		"1"};
 
-	while (1){
-	write_clock(1);
-	write_latch(1);
-	wait(12);
-	write_latch(0);
+	initialrender();
 
-	// This loop uses wait() to set the clock and read the data on the falling edge.
-	for(int i = 1; i <= 16; i++)
-	{
-		wait(6);
-		write_clock(0); // falling edge
-		wait(6);
-		buttons[i] = read_data(); // read bit i
-		
-		write_clock(1); // rising edge; new cycle 
-	}
+	while (1) {
+		write_clock(1);
+		write_latch(1);
+		wait(12);
+		write_latch(0);
 
-	// If START is pressed, end our program.
-	if(buttons[4] == 0){
-		break;
-	}
-
-	
-	for(int i = 1; i<=16; i++){
-
-		
-		if((buttons[i] == 0) && (prev_state[i] == 1)){
+		// This loop uses wait() to set the clock and read the data on the falling edge.
+		for(int i = 1; i <= 16; i++)
+		{
+			wait(6);
+			write_clock(0); // falling edge
+			wait(6);
+			buttons[i] = read_data(); // read bit i
 			
-			// Print the button pressed when the previous state was 1 (OFF) and the current state is 0 (ON)
-			print_message(button_pressed[i]);
-			print_message(" button is pressed\n");
-
-			for (int i =0; i < dk.width; i++) {
-				for (int j=0; j< dk.height; j++) {
-					myDrawPixel(i+offx,j+offy,0);
-				}
-			}
-
-			if (buttons[5] == 0) {
-				offy += 32;
-			}
-			else if (buttons[6] == 0) {
-				offy -= 32;
-			}
-			else if (buttons[7] == 0) {
-				offx -= 32;
-			}
-			else if (buttons[8] == 0) {
-				offx += 32;
-			}
-
-			myDrawImage(dk.pixel_data, dk.width, dk.height, offx, offy);
+			write_clock(1); // rising edge; new cycle 
 		}
 
-		// Set the previous state of the button to the state that was read in this current interation of the loop.
-		prev_state[i] = buttons[i];
+		// If START is pressed, end our program.
+		if(buttons[4] == 0){
+			break;
+		}
+
 		
+		for(int i = 1; i<=16; i++) {
+			if((buttons[i] == 0) && (prev_state[i] == 1)){
+
+				for (int i =0; i < dk.width; i++) {
+					for (int j=0; j< dk.height; j++) {
+						myDrawPixel(i + (32*dkx) + SCREENOFFX, j + (32*dky) + SCREENOFFY,0);
+					}
+				}
+
+				// button 9 = A
+				// button 4 = START
+
+				// up
+				if (buttons[5] == 0) {
+					if (dky > 0) {
+						if (currentlevel[dkx][dky - 1] != 2) {
+							currentlevel[dkx][dky] = 0;
+							dky -= 1;
+							currentlevel[dkx][dky] = 1;
+						}
+					}
+				}
+
+				// down
+				else if (buttons[6] == 0) {
+					if (dky < 19) {
+						if (currentlevel[dkx][dky + 1] != 2) {
+							currentlevel[dkx][dky] = 0;
+							dky += 1;
+							currentlevel[dkx][dky] = 1;
+						}
+					}
+				}
+
+				// left
+				else if (buttons[7] == 0) {
+					if (dkx > 0) {
+						if (currentlevel[dkx - 1][dky] != 2) {
+							currentlevel[dkx][dky] = 0;
+							dkx -= 1;
+							currentlevel[dkx][dky] = 1;
+						}
+					}
+				}
+
+				// right
+				else if (buttons[8] == 0) {
+					if (dkx < 19) {
+						if (currentlevel[dkx + 1][dky] != 2) {
+							currentlevel[dkx][dky] = 0;
+							dkx += 1;
+							currentlevel[dkx][dky] = 1;
+						}
+					}
+				}
+
+				renderscreen();
+			}
+
+			// Set the previous state of the button to the state that was read in this current interation of the loop.
+			prev_state[i] = buttons[i];
+		}
 	}
-	
-}
-print_message("Program is terminating...\n");
-print_message("The dark side of the Force is a pathway to many abilities some consider to be unnatural.\n");
 	return 0;
 }
 
