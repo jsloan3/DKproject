@@ -45,6 +45,11 @@ int paused = 0;
 int menuOption = 0;
 int hasHammer = 0;
 int hasStar = 0;
+int mainMenu = 1;
+int mainMenuOption = 0;
+int moveDelay = 0;
+int moveDelayTimer = 0;
+int gameEnd = 0;
 
 int timeInt = 90;
 char timeChar[20] = "TIME: ";
@@ -188,259 +193,6 @@ void reloadscreen() {
 	}
 }
 
-void levelOne(int *dkx, int *dky, int *goal_x, int *goal_y) {
-	
-	*dkx = 1;
-	*dky = 18;
-	*goal_x = 1;
-	*goal_y = 1;
-	timeInt = 90;
-
-	for(int i = 1; i < 18; i++){
-		currentlevel[i][17] = 2;
-		currentlevel[i][13] = 2;
-		currentlevel[i][8] = 2;
-		currentlevel[i][7] = 2;
-		currentlevel[i][2] = 2;
-	}
-
-	for(int i = 2; i < 19; i++){
-		currentlevel[i][15] = 2;
-		currentlevel[i][11] = 2;
-		currentlevel[i][10] = 2;
-		currentlevel[i][5] = 2;
-		currentlevel[i][4] = 2;
-	}
-
-	currentlevel[12][11] = 0;
-	currentlevel[12][8] = 0;
-	currentlevel[12][5] = 0;
-
-	currentlevel[2][1] = 8;
-	currentlevel[18][6] = 7;
-	currentlevel[1][9] = 8;
-	currentlevel[18][12] = 7;
-
-	currentlevel[12][11] = 30;
-
-	currentlevel[12][5] = 40;
-
-	currentlevel[5][18] = 60;
-	currentlevel[10][18] = 62;
-
-	currentlevel[18][2] = 52;
-
-	currentlevel[1][1] = 21;
-	
-}
-
-void levelTwo(int *dkx, int *dky, int *goal_x, int *goal_y){
-
-	*dkx = 18;
-	*dky = 1;
-	*goal_x = 10;
-	*goal_y = 17;
-	timeInt = 90;
-
-	for (int i = 1; i < SIZEX-1; i++) {
-		for (int j = 1; j < SIZEY-1; j++) {
-			currentlevel[i][j] = 2;
-		}
-	}
-	
-	// Hallway for spawn
-	for (int i = 1; i < 19; i++){
-		currentlevel[18][i] = 0;
-	}
-
-	// Stepping Stairs
-	currentlevel[16][18] = 0;
-	currentlevel[16][16] = 0;
-	currentlevel[14][16] = 0;
-	currentlevel[14][14] = 0;
-	currentlevel[12][14] = 0;
-	currentlevel[12][12] = 0;
-	currentlevel[10][12] = 0;
-	currentlevel[10][10] = 0;
-	currentlevel[5][10] = 0;
-
-	// 3x3 room
-	for (int i = 6; i < 9; i++){
-		currentlevel[9][i] = 0;
-		currentlevel[10][i] = 0;
-		currentlevel[11][i] = 0;
-	}
-
-	// Hallways
-	for (int i = 3; i < 6; i++){
-		currentlevel[10][i] = 0;
-	}
-	for (int i = 6; i < 10; i++){
-		currentlevel[i][3] = 0;
-	}
-	for (int i = 4; i < 18; i++){
-		currentlevel[6][i] = 0;
-	}
-	for (int i = 6; i < 11; i++){
-		currentlevel[i][17] = 0;
-	}
-
-	// Snake
-	currentlevel[6][17] = 12;
-
-	// Goal
-	currentlevel[10][17] = 21;
-}
-
-void levelThree(int *dkx,int *dky, int *goal_x, int *goal_y){
-
-	*dkx = 9;
-	*dky = 8;
-	*goal_x = 17;
-	*goal_y = 3;
-	timeInt = 90;
-
-	for (int i = 1; i < SIZEX-1; i++) {
-		for (int j = 1; j < SIZEY-1; j++) {
-			currentlevel[i][j] = 2;
-		}
-	}
-
-	currentlevel[9][8] = 0;
-	currentlevel[9][9] = 0;
-	currentlevel[9][10] = 0;
-
-	for(int i = 10; i < 15; i++){
-		currentlevel[8][i] = 0;
-		currentlevel[10][i] = 0;
-	}
-
-	currentlevel[7][14] = 0;
-	currentlevel[6][14] = 0;
-
-	for(int i = 4; i < 15; i++){
-		currentlevel[5][i] = 0;
-		currentlevel[13][i] = 0;
-	}
-
-	for(int i = 6; i < 13; i++){
-		currentlevel[i][4] = 0;
-		currentlevel[i][5] = 0;
-	}
-
-	currentlevel[4][5] = 0;
-
-	for(int i = 5; i < 19; i++){
-		currentlevel[3][i] = 0;
-	}
-
-	for(int i = 4; i < 15; i++){
-		currentlevel[i][16] = 0;
-		currentlevel[i][17] = 0;
-		currentlevel[i][18] = 0;
-	}
-
-	currentlevel[15][16] = 0;
-	currentlevel[16][16] = 0;
-
-	for(int i = 3; i < 17; i++){
-		currentlevel[17][i] = 0;
-	}
-
-	// Snakes
-	currentlevel[5][4] = 8;
-	currentlevel[13][5] = 7;
-
-	currentlevel[17][4] = 7;
-	currentlevel[17][5] = 7;
-	currentlevel[17][6] = 7;
-	currentlevel[17][7] = 7;
-	currentlevel[17][8] = 7;
-	currentlevel[17][9] = 7;
-
-	currentlevel[3][16] = 8;
-	currentlevel[14][17] = 7;
-	currentlevel[3][18] = 8;
-
-	// Goal
-	currentlevel[17][3] = 21;
-}
-
-void levelFour(int *dkx, int *dky, int *goal_x, int *goal_y){
-
-	*dkx = 9;
-	*dky = 1;
-	*goal_x = 10;
-	*goal_y = 18;
-	timeInt = 90;
-
-
-	for (int i = 1; i < 19; i++) {
-		currentlevel[4][i] = 2;
-		currentlevel[15][i] = 2;
-	}
-
-	for (int i = 6; i < 14; i++) {
-		currentlevel[i][2] = 2;
-		currentlevel[i][3] = 2;
-	}
-
-	for (int i = 6; i < 14; i++) {
-		currentlevel[i][2] = 2;
-		currentlevel[i][3] = 2;
-	}
-
-	for (int i = 5; i < 7; i++) {
-		currentlevel[6][i] = 2;
-		currentlevel[7][i] = 2;
-		currentlevel[8][i] = 2;
-		currentlevel[11][i] = 2;
-		currentlevel[12][i] = 2;
-		currentlevel[13][i] = 2;
-	}
-	currentlevel[8][7] = 2;
-	currentlevel[11][7] = 2;
-
-	currentlevel[5][8] = 2;
-	currentlevel[6][8] = 2;
-	currentlevel[7][8] = 2;
-	currentlevel[8][8] = 2;
-	currentlevel[11][8] = 2;
-	currentlevel[12][8] = 2;
-	currentlevel[13][8] = 2;
-	currentlevel[14][8] = 2;
-
-	for (int i = 11; i < 15; i++)
-	{
-		currentlevel[5][i] = 2;
-		currentlevel[6][i] = 2;
-		currentlevel[7][i] = 2;
-		currentlevel[8][i] = 2;
-		currentlevel[11][i] = 2;
-		currentlevel[12][i] = 2;
-		currentlevel[13][i] = 2;
-		currentlevel[14][i] = 2;
-	}
-
-	// Snakes
-	currentlevel[1][1] = 8;
-	currentlevel[2][2] = 8;
-	currentlevel[3][3] = 8;
-
-	currentlevel[18][1] = 7;
-	currentlevel[17][2] = 7;
-	currentlevel[16][3] = 7;
-
-	currentlevel[1][16] = 7;
-	currentlevel[3][18] = 8;
-
-	currentlevel[16][16] = 8;
-	currentlevel[18][18] = 7;
-
-	// Goal
-	currentlevel[10][18] = 21;
-}
-
 void snakeMover() {
 	for (int i = 0; i < SIZEX; i++) {
 		for (int j = 0; j < SIZEY; j++) {
@@ -456,7 +208,9 @@ void snakeMover() {
 					}
 				}
 				
-				if ((currentlevel[i - 1][j] == 2) || (currentlevel[i - 1][j] == 21)) {
+				if ((currentlevel[i - 1][j] == 2) || (currentlevel[i - 1][j] == 21)
+					 || (currentlevel[i - 1][j] == 62) || (currentlevel[i - 1][j] == 60)
+					 	 || (currentlevel[i - 1][j] == 40)) {
 					currentlevel[i][j] = 8;
 				}
 				if (currentlevel[i - 1][j] == 1) {
@@ -484,7 +238,9 @@ void snakeMover() {
 					}
 				}
 
-				if ((currentlevel[i + 1][j] == 2) || (currentlevel[i + 1][j] == 21)) {
+				if ((currentlevel[i + 1][j] == 2) || (currentlevel[i + 1][j] == 21)
+					 || (currentlevel[i + 1][j] == 62) || (currentlevel[i + 1][j] == 60
+					 	|| (currentlevel[i + 1][j] == 40))) {
 					currentlevel[i][j] = 7;
 				}
 				if (currentlevel[i + 1][j] == 1) {
@@ -622,10 +378,294 @@ void timeToChar() {
 
 }
 
+void levelOne(int *dkx, int *dky, int *goal_x, int *goal_y) {
+	
+	*dkx = 1;
+	*dky = 18;
+	*goal_x = 1;
+	*goal_y = 1;
+	timeInt = 90;
+
+	for(int i = 1; i < 18; i++){
+		currentlevel[i][17] = 2;
+		currentlevel[i][13] = 2;
+		currentlevel[i][8] = 2;
+		currentlevel[i][7] = 2;
+		currentlevel[i][2] = 2;
+	}
+
+	for(int i = 2; i < 19; i++){
+		currentlevel[i][15] = 2;
+		currentlevel[i][11] = 2;
+		currentlevel[i][10] = 2;
+		currentlevel[i][5] = 2;
+		currentlevel[i][4] = 2;
+	}
+
+	currentlevel[12][11] = 0;
+	currentlevel[12][8] = 0;
+	currentlevel[12][5] = 0;
+
+	currentlevel[2][1] = 8;
+	currentlevel[18][6] = 7;
+	currentlevel[1][9] = 8;
+	currentlevel[18][12] = 7;
+
+	currentlevel[12][11] = 30;
+
+	currentlevel[12][5] = 40;
+
+	currentlevel[5][18] = 60;
+	currentlevel[10][18] = 62;
+
+	currentlevel[18][2] = 52;
+
+	currentlevel[1][1] = 21;
+
+	renderscreen();
+	
+}
+
+void levelTwo(int *dkx, int *dky, int *goal_x, int *goal_y){
+
+	*dkx = 18;
+	*dky = 1;
+	*goal_x = 10;
+	*goal_y = 17;
+	timeInt = 90;
+
+	for (int i = 1; i < SIZEX-1; i++) {
+		for (int j = 1; j < SIZEY-1; j++) {
+			currentlevel[i][j] = 2;
+		}
+	}
+	
+	// Hallway for spawn
+	for (int i = 1; i < 19; i++){
+		currentlevel[18][i] = 0;
+	}
+
+
+	// 3x3 room
+	for (int i = 6; i < 9; i++){
+		currentlevel[9][i] = 0;
+		currentlevel[10][i] = 0;
+		currentlevel[11][i] = 0;
+	}
+
+	// Hallways
+	for (int i = 3; i < 6; i++){
+		currentlevel[10][i] = 0;
+	}
+	for (int i = 6; i < 10; i++){
+		currentlevel[i][3] = 0;
+	}
+	for (int i = 4; i < 18; i++){
+		currentlevel[6][i] = 0;
+	}
+	for (int i = 6; i < 11; i++){
+		currentlevel[i][17] = 0;
+	}
+
+	// Snake
+	currentlevel[6][17] = 12;
+
+	// Powerups
+	currentlevel[18][18] = 35;
+	currentlevel[16][18] = 35;
+	currentlevel[16][16] = 35;
+	currentlevel[14][16] = 35;
+	currentlevel[14][14] = 35;
+	currentlevel[12][14] = 35;
+	currentlevel[12][12] = 35;
+	currentlevel[10][12] = 35;
+	currentlevel[10][10] = 35;
+	currentlevel[10][7] = 40;
+	currentlevel[5][10] = 30;
+	
+	// Goal
+	currentlevel[10][17] = 21;
+
+	renderscreen();
+}
+
+void levelThree(int *dkx,int *dky, int *goal_x, int *goal_y){
+
+	*dkx = 9;
+	*dky = 8;
+	*goal_x = 17;
+	*goal_y = 3;
+	timeInt = 90;
+
+	for (int i = 1; i < SIZEX-1; i++) {
+		for (int j = 1; j < SIZEY-1; j++) {
+			currentlevel[i][j] = 2;
+		}
+	}
+
+	currentlevel[9][8] = 0;
+	currentlevel[9][9] = 0;
+	currentlevel[9][10] = 0;
+
+	for(int i = 10; i < 15; i++){
+		currentlevel[8][i] = 0;
+		currentlevel[10][i] = 0;
+	}
+
+	currentlevel[7][14] = 0;
+	currentlevel[6][14] = 0;
+
+	for(int i = 4; i < 15; i++){
+		currentlevel[5][i] = 0;
+		currentlevel[13][i] = 0;
+	}
+
+	for(int i = 6; i < 13; i++){
+		currentlevel[i][4] = 0;
+		currentlevel[i][5] = 0;
+	}
+
+	for(int i = 5; i < 19; i++){
+		currentlevel[3][i] = 0;
+	}
+
+	for(int i = 4; i < 15; i++){
+		currentlevel[i][16] = 0;
+		currentlevel[i][17] = 0;
+		currentlevel[i][18] = 0;
+	}
+
+	currentlevel[15][16] = 0;
+	currentlevel[16][16] = 0;
+
+	for(int i = 3; i < 17; i++){
+		currentlevel[17][i] = 0;
+	}
+	currentlevel[13][16] = 2;
+	currentlevel[17][4] = 2;
+
+	// Snakes
+	currentlevel[5][4] = 8;
+	currentlevel[13][5] = 7;
+	currentlevel[3][16] = 8;
+	currentlevel[14][17] = 7;
+	currentlevel[3][18] = 8;
+
+	// Powerups
+	currentlevel[14][16] = 35;
+	currentlevel[13][14] = 60;
+	currentlevel[4][5] = 62;
+
+	// Goal
+	currentlevel[17][3] = 21;
+
+	renderscreen();
+}
+
+void levelFour(int *dkx, int *dky, int *goal_x, int *goal_y){
+
+	*dkx = 9;
+	*dky = 1;
+	*goal_x = 10;
+	*goal_y = 18;
+	timeInt = 90;
+
+
+	for (int i = 1; i < 19; i++) {
+		currentlevel[4][i] = 2;
+		currentlevel[15][i] = 2;
+	}
+
+	for (int i = 6; i < 14; i++) {
+		currentlevel[i][2] = 2;
+		currentlevel[i][3] = 2;
+	}
+
+	for (int i = 6; i < 14; i++) {
+		currentlevel[i][2] = 2;
+		currentlevel[i][3] = 2;
+	}
+
+	for (int i = 5; i < 7; i++) {
+		currentlevel[6][i] = 2;
+		currentlevel[7][i] = 2;
+		currentlevel[8][i] = 2;
+		currentlevel[11][i] = 2;
+		currentlevel[12][i] = 2;
+		currentlevel[13][i] = 2;
+	}
+	currentlevel[8][7] = 2;
+	currentlevel[11][7] = 2;
+
+	currentlevel[5][8] = 2;
+	currentlevel[6][8] = 2;
+	currentlevel[7][8] = 2;
+	currentlevel[8][8] = 2;
+	currentlevel[11][8] = 2;
+	currentlevel[12][8] = 2;
+	currentlevel[13][8] = 2;
+	currentlevel[14][8] = 2;
+
+	for (int i = 11; i < 15; i++)
+	{
+		currentlevel[5][i] = 2;
+		currentlevel[6][i] = 2;
+		currentlevel[7][i] = 2;
+		currentlevel[8][i] = 2;
+		currentlevel[11][i] = 2;
+		currentlevel[12][i] = 2;
+		currentlevel[13][i] = 2;
+		currentlevel[14][i] = 2;
+	}
+
+	// Snakes
+	currentlevel[1][1] = 8;
+	currentlevel[2][2] = 8;
+	currentlevel[3][3] = 8;
+
+	currentlevel[18][1] = 7;
+	currentlevel[17][2] = 7;
+	currentlevel[16][3] = 7;
+
+	currentlevel[1][16] = 7;
+	currentlevel[3][18] = 8;
+
+	currentlevel[16][16] = 8;
+	currentlevel[18][18] = 7;
+
+	// Powerups
+	currentlevel[5][1] = 40;
+	currentlevel[14][1] = 40;
+
+	currentlevel[3][1] = 60;
+	currentlevel[14][1] = 52;
+
+	currentlevel[7][7] = 35;
+	currentlevel[12][7] = 35;
+
+	currentlevel[5][10] = 30;
+	currentlevel[14][10] = 30;
+
+	currentlevel[3][18] = 40;
+	currentlevel[14][18] = 40;
+	
+	for(int i = 11; i < 15; i++){
+		currentlevel[9][i] = 62;
+		currentlevel[10][i] = 62;
+	}
+
+	// Goal
+	currentlevel[10][18] = 21;
+
+	renderscreen();
+}
 
 void timer() {
 	timerCount++;
 	gameTimeTicker++;
+	if (moveDelay == 1) {
+		moveDelayTimer++;
+	}
 	if (timerCount > 1000) {
 		snakeMover();
 		snakeMoverVert();
@@ -651,9 +691,16 @@ void timer() {
 			drawString(SCREENOFFX + 200, SCREENOFFY - 15, "LIVES: ", 60);
 			drawString(SCREENOFFX + 250, SCREENOFFY - 15, livesChar, 100);
 			
-			
 			gameTimeTicker = 0;
 		}
+
+		if (timeInt <= 0) {
+			loseGame();
+		}
+	}
+	if (moveDelayTimer > 300) {
+		moveDelayTimer = 0;
+		moveDelay = 0;
 	}
 	return;
 }
@@ -697,8 +744,10 @@ void loadMenu() {
 }
 
 void restartLevel() {
-	clearLevel;
+	clearLevel();
 	clearscreen();
+	hasStar = 0;
+	hasHammer = 0;
 	if(level == 0){
 		loadMenu();
 	}
@@ -714,11 +763,35 @@ void restartLevel() {
 	else if(level == 4){
 		levelFour(&dkx, &dky, &goal_x, &goal_y);
 	}
+	initialrender();
 	currentlevel[dkx][dky] = 1;
+	renderscreen();
 	return;
 }
 
 void loseGame() {
+	gameEnd = 1;
+	paused = 1;
+	loadMenu();
+	drawString(SCREENOFFX + (10*32) - 75, SCREENOFFY + (10*32) - 60, "YOU LOST.. TRY AGAIN?", 200);
+	char firstScoreChar = score + '0';
+	scoreChar[0] = firstScoreChar;
+	scoreChar[1] = '\0';
+	drawString(SCREENOFFX + (10*32) - 40, SCREENOFFY + (10*32) - 40, "SCORE: ", 60);
+	drawString(SCREENOFFX + (10*32) + 10, SCREENOFFY + (10*32) - 40, scoreChar, 100);
+	return;
+}
+
+void winGame() {
+	gameEnd = 1;
+	paused = 1;
+	loadMenu();
+	drawString(SCREENOFFX + (10*32) - 35, SCREENOFFY + (10*32) - 60, "YOU WON!!", 200);
+	char firstScoreChar = score + '0';
+	scoreChar[0] = firstScoreChar;
+	scoreChar[1] = '\0';
+	drawString(SCREENOFFX + (10*32) - 40, SCREENOFFY + (10*32) - 40, "SCORE: ", 60);
+	drawString(SCREENOFFX + (10*32) + 10, SCREENOFFY + (10*32) - 40, scoreChar, 100);
 	return;
 }
 
@@ -740,11 +813,9 @@ void clearscreen() {
 	return;
 }
 
-void pauseGame() {
-
-}
-
 void nextLevel(int *level) {
+	hasStar = 0;
+	hasHammer = 0;
 	clearLevel();
 	*level += 1;
 	//*level = 3;
@@ -759,6 +830,10 @@ void nextLevel(int *level) {
 	}
 	reloadscreen();
 	initialrender();
+	renderscreen();
+	if(*level == 5) {
+		winGame();
+	}
 }
 
 void keyUp() {
@@ -783,29 +858,18 @@ int main() {
 	uart_init();
     fb_init();
 
-	for (int i = 0; i < SIZEX; i++) {
-		for (int j = 0; j < SIZEY; j++) {
-			currentlevel[i][j] = 0;
-		}
-	}
-
-	for (int i = 0; i < SIZEX; i++)
-	{
-		currentlevel[i][0] = 2;
-		currentlevel[i][19] = 2;
-		currentlevel[0][i] = 2;
-		currentlevel[19][i] = 2;
-	}
-	
-
 	restart:
 
 	clearscreen();
-	clearLevel();
-	restartLevel();
 
-	int offx = 300;
-	int offy = 300;
+	if (mainMenu == 0) {
+		clearLevel();
+		restartLevel();
+		reloadscreen();
+		initialrender();
+		renderscreen();
+	}
+	
 
 	print_message("Created by Aaron Tigley and Jaxon Sloan\n");
     
@@ -814,9 +878,7 @@ int main() {
 	int prev_state[17]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int pressed = 0;
 
-	reloadscreen();
-	initialrender();
-	renderscreen();
+	
 
 	
 
@@ -837,8 +899,39 @@ int main() {
 			write_clock(1); // rising edge; new cycle 
 		}
 
-		if (paused == 0) {
+		if (paused == 0 && mainMenu == 0) {
 			timer();
+		}
+
+		if (mainMenu == 1) {
+			paused = 1;
+
+
+			if (mainMenuOption == 0) {
+				for (int h = 0; h < 10; h++) {
+					for (int k = 0; k < 10; k++) {
+					myDrawPixel(SCREENOFFX + (10 * 32) - 60 + h, SCREENOFFY + (10*32) - 25 + k, 200);
+					}
+				}
+			}
+
+			if (mainMenuOption == 1) {
+				for (int h = 0; h < 10; h++) {
+					for (int k = 0; k < 10; k++) {
+					myDrawPixel(SCREENOFFX + (10 * 32) - 60 + h, SCREENOFFY + (10*32) + 25 + k, 200);
+					}
+				}
+			}
+			
+
+			drawString(SCREENOFFX + (10*32) - 25, SCREENOFFY + (10*32) - 25, "START GAME", 150);
+			drawString(SCREENOFFX + (10*32) - 25, SCREENOFFY + (10*32) + 25, "QUIT GAME", 150);
+
+			drawString(SCREENOFFX + (10*32) - 55, SCREENOFFY + (10*32) - 140, "DANKEY KANG 9000", 200);
+			drawString(SCREENOFFX + (10*32) - 115, SCREENOFFY + (10*32) - 120, "By Jaxon Sloan and Aaron Tigley", 200);
+
+
+
 		}
 		
 
@@ -852,7 +945,7 @@ int main() {
 					}
 				}
 
-				if(buttons[4] == 0){
+				if(buttons[4] == 0 && mainMenu == 0 && gameEnd == 0){
 					if (paused == 0) {
 						paused = 1;
 						loadMenu();
@@ -870,9 +963,10 @@ int main() {
 				// up
 
 				if (paused == 0) {
-					if (buttons[5] == 0) {
+					if (buttons[5] == 0 && moveDelay == 0) {
 						if (dky > 0) {
 							
+							moveDelay = 1;
 							
 							if ((currentlevel[dkx][dky - 1] == 2) && hasHammer == 1) {
 								currentlevel[dkx][dky - 1] = 0;
@@ -916,8 +1010,10 @@ int main() {
 					}
 
 					// down
-					else if (buttons[6] == 0) {
+					else if (buttons[6] == 0 && moveDelay == 0) {
 						if (dky < 19) {
+
+							moveDelay = 1;
 							
 							if ((currentlevel[dkx][dky + 1] == 2) && hasHammer == 1) {
 								currentlevel[dkx][dky + 1] = 0;
@@ -962,8 +1058,10 @@ int main() {
 					}
 
 					// left
-					else if (buttons[7] == 0) {
+					else if (buttons[7] == 0 && moveDelay == 0) {
 						if (dkx > 0) {
+
+							moveDelay = 1;
 							
 							if ((currentlevel[dkx - 1][dky] == 2) && hasHammer == 1) {
 								currentlevel[dkx - 1][dky] = 0;
@@ -1013,8 +1111,10 @@ int main() {
 					}
 
 					// right
-					else if (buttons[8] == 0) {
+					else if (buttons[8] == 0 && moveDelay == 0) {
 						if (dkx < 19) {
+
+							moveDelay = 1;
 							
 							if ((currentlevel[dkx + 1][dky] == 2) && hasHammer == 1) {
 								currentlevel[dkx + 1][dky] = 0;
@@ -1058,7 +1158,7 @@ int main() {
 						}
 					}
 					renderscreen();
-				} else if (paused == 1) {
+				} else if (paused == 1 && mainMenu == 0) {
 
 					if (buttons[5] == 0) {
 						menuOption = 0;
@@ -1078,6 +1178,57 @@ int main() {
 						}
 					}
 
+					if ((buttons[9] == 0) && (menuOption == 0)) {
+						gameEnd = 0;
+						level = 1;
+						score = 1;
+						lives = 4;
+						restartLevel();
+						paused = 0;
+					}
+
+					else if ((buttons[9] == 0) && (menuOption == 1)) { 
+						gameEnd = 0;
+						level = 0;
+						score = 1;
+						lives = 4;
+						mainMenu = 1;
+						goto restart;
+					}
+
+				} else if (mainMenu == 1) {
+					if (buttons[5] == 0) {
+						mainMenuOption = 0;
+						for (int h = 0; h < 10; h++) {
+							for (int k = 0; k < 10; k++) {
+							myDrawPixel(SCREENOFFX + (10 * 32) - 60 + h, SCREENOFFY + (10*32) + 25 + k, 0);
+							}
+						}
+					}
+					else if (buttons[6] == 0) {
+						mainMenuOption = 1;
+						for (int h = 0; h < 10; h++) {
+							for (int k = 0; k < 10; k++) {
+							myDrawPixel(SCREENOFFX + (10 * 32) - 60 + h, SCREENOFFY + (10*32) - 25 + k, 0);
+							}
+						}
+					}
+
+					if ((buttons[9] == 0) && (mainMenuOption == 0)) {
+						gameEnd = 0;
+						level = 1;
+						lives = 4;
+						score = 1;
+						mainMenu = 0;
+						paused = 0;
+						goto restart;
+					}
+
+					if ((buttons[9] == 0) && (mainMenuOption == 1)) {
+						gameEnd = 0;
+						clearscreen();
+						goto end;
+					}
 				}
 				
 
@@ -1088,6 +1239,7 @@ int main() {
 			prev_state[i] = buttons[i];
 		}
 	}
+	end:
 	return 0;
 }
 
