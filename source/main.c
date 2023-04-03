@@ -11,6 +11,9 @@
 #include "heart.h"
 #include "hammer.h"
 #include "coin.h"
+#include "star.h"
+#include "key.h"
+#include "door.h"
 
 #define GPIO_BASE 0xFE200000
 
@@ -41,6 +44,7 @@ int score = 1;
 int paused = 0;
 int menuOption = 0;
 int hasHammer = 0;
+int hasStar = 0;
 
 int timeInt = 90;
 char timeChar[20] = "TIME: ";
@@ -157,6 +161,15 @@ void initialrender() {
 			if (currentlevel[i][j] == 40) {
 				myDrawImage(coin.pixel_data, coin.width, coin.height, (i*32 + SCREENOFFX), (j*32 + SCREENOFFY));
 			}
+			if (currentlevel[i][j] == 52) {
+				myDrawImage(star.pixel_data, star.width, star.height, (i*32 + SCREENOFFX), (j*32 + SCREENOFFY));
+			}
+			if (currentlevel[i][j] == 60) {
+				myDrawImage(key.pixel_data, key.width, key.height, (i*32 + SCREENOFFX), (j*32 + SCREENOFFY));
+			}
+			if (currentlevel[i][j] == 62) {
+				myDrawImage(door.pixel_data, door.width, door.height, (i*32 + SCREENOFFX), (j*32 + SCREENOFFY));
+			}
 		}
 	}
 }
@@ -212,9 +225,13 @@ void levelOne(int *dkx, int *dky, int *goal_x, int *goal_y) {
 
 	currentlevel[12][5] = 40;
 
-	currentlevel[5][18] = 35;
+	currentlevel[5][18] = 60;
+	currentlevel[10][18] = 62;
+
+	currentlevel[18][2] = 52;
 
 	currentlevel[1][1] = 21;
+	
 }
 
 void levelTwo(int *dkx, int *dky, int *goal_x, int *goal_y){
@@ -443,7 +460,14 @@ void snakeMover() {
 					currentlevel[i][j] = 8;
 				}
 				if (currentlevel[i - 1][j] == 1) {
-					loseLife();
+					if (hasStar == 0) {
+						loseLife();
+					}
+					for (int x = 0; x < snake.width; x++) {
+						for (int y = 0; y < snake.height; y++) {
+							myDrawPixel(x + (32*i) + SCREENOFFX, y + (32*j) + SCREENOFFY,0);
+						}	
+					}
 					currentlevel[i][j] = 0;
 				}
 
@@ -464,7 +488,14 @@ void snakeMover() {
 					currentlevel[i][j] = 7;
 				}
 				if (currentlevel[i + 1][j] == 1) {
-					loseLife();
+					if (hasStar == 0) {
+						loseLife();
+					}
+					for (int x = 0; x < snake.width; x++) {
+						for (int y = 0; y < snake.height; y++) {
+							myDrawPixel(x + (32*i) + SCREENOFFX, y + (32*j) + SCREENOFFY,0);
+						}	
+					}
 					currentlevel[i][j] = 0;
 				}
 
@@ -506,7 +537,14 @@ void snakeMoverVert() {
 					currentlevel[i][j] = 12;
 				}
 				if (currentlevel[i][j + 1] == 1) {
-					loseLife();
+					if (hasStar == 0) {
+						loseLife();
+					}
+					for (int x = 0; x < snake.width; x++) {
+						for (int y = 0; y < snake.height; y++) {
+							myDrawPixel(x + (32*i) + SCREENOFFX, y + (32*j) + SCREENOFFY,0);
+						}	
+					}
 					currentlevel[i][j] = 0;
 				}
 				j++;
@@ -529,7 +567,14 @@ void snakeMoverVert() {
 					currentlevel[i][j] = 11;
 				}
 				if (currentlevel[i][j - 1] == 1) {
-					loseLife();
+					if (hasStar == 0) {
+						loseLife();
+					}
+					for (int x = 0; x < snake.width; x++) {
+						for (int y = 0; y < snake.height; y++) {
+							myDrawPixel(x + (32*i) + SCREENOFFX, y + (32*j) + SCREENOFFY,0);
+						}	
+					}
 					currentlevel[i][j] = 0;
 				}
 
@@ -652,6 +697,7 @@ void loadMenu() {
 }
 
 void restartLevel() {
+	clearLevel;
 	clearscreen();
 	if(level == 0){
 		loadMenu();
@@ -699,6 +745,7 @@ void pauseGame() {
 }
 
 void nextLevel(int *level) {
+	clearLevel();
 	*level += 1;
 	//*level = 3;
 	if(*level == 2){
@@ -712,6 +759,21 @@ void nextLevel(int *level) {
 	}
 	reloadscreen();
 	initialrender();
+}
+
+void keyUp() {
+	for (int i = 0; i < 20; i++) {
+		for (int j = 0; j < 20; j++) {
+			if (currentlevel[i][j] == 62) {
+				currentlevel[i][j] = 0;
+				for (int x = 0; x < door.width; x++) {
+						for (int y = 0; y < door.height; y++) {
+							myDrawPixel(x + (32*i) + SCREENOFFX, y + (32*j) + SCREENOFFY,0);
+						}	
+				}
+			}
+		}
+	}
 }
 
 int main() {
@@ -821,6 +883,14 @@ int main() {
 								lives += 1;
 							}
 
+							if (currentlevel[dkx][dky - 1] == 60) {
+								keyUp();
+							}
+
+							if (currentlevel[dkx][dky - 1] == 52) {
+								hasStar = 1;
+							}
+
 							if (currentlevel[dkx][dky - 1] == 40) {
 								score += 1;
 							}
@@ -837,7 +907,7 @@ int main() {
 							}*/
 
 							else if ((currentlevel[dkx][dky - 1] != 2) && (currentlevel[dkx][dky - 1] != 11) 
-							&& (currentlevel[dkx][dky - 1] != 12) && (currentlevel[dkx][dky - 1] != 7) && (currentlevel[dkx][dky - 1] != 8)) {
+							&& (currentlevel[dkx][dky - 1] != 12) && (currentlevel[dkx][dky - 1] != 7) && (currentlevel[dkx][dky - 1] != 8) && (currentlevel[dkx][dky - 1] != 62)) {
 								currentlevel[dkx][dky] = 0;
 								dky -= 1;
 								currentlevel[dkx][dky] = 1;
@@ -858,6 +928,14 @@ int main() {
 								lives += 1;
 							}
 
+							if (currentlevel[dkx][dky + 1] == 60) {
+								keyUp();
+							}
+
+							if (currentlevel[dkx][dky + 1] == 52) {
+								hasStar = 1;
+							}
+
 							if (currentlevel[dkx][dky + 1] == 40) {
 								score += 1;
 							}
@@ -874,7 +952,7 @@ int main() {
 							}*/
 
 							else if ((currentlevel[dkx][dky + 1] != 2)  && (currentlevel[dkx][dky + 1] != 11) 
-							&& (currentlevel[dkx][dky + 1] != 12) && (currentlevel[dkx][dky + 1] != 7) && (currentlevel[dkx][dky + 1] != 8)) {
+							&& (currentlevel[dkx][dky + 1] != 12) && (currentlevel[dkx][dky + 1] != 7) && (currentlevel[dkx][dky + 1] != 8) && (currentlevel[dkx][dky + 1] != 62)) {
 								currentlevel[dkx][dky] = 0;
 								dky += 1;
 								currentlevel[dkx][dky] = 1;
@@ -892,8 +970,20 @@ int main() {
 								hasHammer = 0;
 							}
 
+							if ((currentlevel[dkx - 1][dky] == 8) && (hasStar == 1)) {
+								currentlevel[dkx - 1][dky] = 0;
+							}
+
 							if (currentlevel[dkx - 1][dky] == 30) {
 								lives += 1;
+							}
+
+							if (currentlevel[dkx - 1][dky] == 60) {
+								keyUp();
+							}
+
+							if (currentlevel[dkx - 1][dky] == 52) {
+								hasStar = 1;
 							}
 
 							if (currentlevel[dkx - 1][dky] == 40) {
@@ -912,7 +1002,7 @@ int main() {
 							}*/
 							
 							else if ((currentlevel[dkx - 1][dky] != 2) && (currentlevel[dkx - 1][dky] != 11) 
-							&& (currentlevel[dkx - 1][dky] != 12) && (currentlevel[dkx - 1][dky] != 7) && (currentlevel[dkx - 1][dky] != 8)) {
+							&& (currentlevel[dkx - 1][dky] != 12) && (currentlevel[dkx - 1][dky] != 7) && (currentlevel[dkx - 1][dky] != 8) && (currentlevel[dkx - 1][dky] != 62)) {
 								currentlevel[dkx][dky] = 0;
 								dkx -= 1;
 								currentlevel[dkx][dky] = 1;
@@ -935,6 +1025,14 @@ int main() {
 								lives += 1;
 							}
 
+							if (currentlevel[dkx + 1][dky] == 60) {
+								keyUp();
+							}
+
+							if (currentlevel[dkx + 1][dky] == 52) {
+								hasStar = 1;
+							}
+
 							if (currentlevel[dkx + 1][dky] == 40) {
 								score += 1;
 							}
@@ -951,7 +1049,7 @@ int main() {
 							}*/
 
 							else if ((currentlevel[dkx + 1][dky] != 2) && (currentlevel[dkx + 1][dky] != 11) 
-							&& (currentlevel[dkx + 1][dky] != 12) && (currentlevel[dkx + 1][dky] != 7) && (currentlevel[dkx + 1][dky] != 8)) {
+							&& (currentlevel[dkx + 1][dky] != 12) && (currentlevel[dkx + 1][dky] != 7) && (currentlevel[dkx + 1][dky] != 8) && (currentlevel[dkx + 1][dky] != 62)) {
 								currentlevel[dkx][dky] = 0;
 								dkx += 1;
 								currentlevel[dkx][dky] = 1;
